@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn import datasets, linear_model
+from sklearn.metrics import r2_score
 
 import visualize as vs
 
@@ -13,14 +14,14 @@ def linear_regression(diabetes_X_train, diabetes_y_train, diabetes_X_test, diabe
     regr.fit(diabetes_X_train, diabetes_y_train)
 
     # The coefficients
-    print('Coefficients: \n', regr.coef_)
+    #print('Coefficients: \n', regr.coef_)
 
     # The mean square error
     print("Residual sum of squares: %.2f"
           % np.mean((regr.predict(diabetes_X_test) - diabetes_y_test) ** 2))
 
     # Explained variance score: 1 is perfect prediction
-    print('Variance score: %.2f' % regr.score(diabetes_X_test, diabetes_y_test))
+    print('R2 score: %.2f' % regr.score(diabetes_X_test, diabetes_y_test))
 
     # Plot the model
     vs.scatter_for_regression(diabetes_X_test, diabetes_y_test, regr.predict(diabetes_X_test))
@@ -40,7 +41,9 @@ def my_linear_regression(diabetes_X_train, diabetes_y_train, diabetes_X_test, di
     for i in range(0, steps) :
         w0, w1 = updateParameters(w0, w1, X, y, alpha)
 
-    print("MyRSS: ", np.mean((w0 + w1 * diabetes_X_test - diabetes_y_test) ** 2))
+    rss = np.mean((w0 + w1 * diabetes_X_test - diabetes_y_test) ** 2)
+    print('My Residual sum of squares: %.2f' % rss)
+    print('My R2 score: %.2f'% r2_score(diabetes_y_test, w0 + w1 * diabetes_X_test))
 
 
 
@@ -86,4 +89,6 @@ if __name__ == '__main__':
 
     # do simple linear regression
     linear_regression(diabetes_X_train, diabetes_y_train, diabetes_X_test, diabetes_y_test)
+
+    # do my linear regression
     my_linear_regression(diabetes_X_train, diabetes_y_train, diabetes_X_test, diabetes_y_test)
