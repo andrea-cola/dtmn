@@ -13,9 +13,6 @@ def linear_regression(diabetes_X_train, diabetes_y_train, diabetes_X_test, diabe
     # Train the model using the training sets
     regr.fit(diabetes_X_train, diabetes_y_train)
 
-    # The coefficients
-    #print('Coefficients: \n', regr.coef_)
-
     # The mean square error
     print("Residual sum of squares: %.2f"
           % np.mean((regr.predict(diabetes_X_test) - diabetes_y_test) ** 2))
@@ -24,7 +21,7 @@ def linear_regression(diabetes_X_train, diabetes_y_train, diabetes_X_test, diabe
     print('R2 score: %.2f' % regr.score(diabetes_X_test, diabetes_y_test))
 
     # Plot the model
-    vs.scatter_for_regression(diabetes_X_test, diabetes_y_test, regr.predict(diabetes_X_test))
+    vs.scatter_for_regression(diabetes_X_test, diabetes_y_test, regr.predict(diabetes_X_test), 'blue')
 
 
 
@@ -36,7 +33,7 @@ def my_linear_regression(diabetes_X_train, diabetes_y_train, diabetes_X_test, di
     y = diabetes_y_train
 
     steps = 1000
-    alpha = 0.005
+    alpha = 0.5
 
     for i in range(0, steps) :
         w0, w1 = updateParameters(w0, w1, X, y, alpha)
@@ -44,28 +41,28 @@ def my_linear_regression(diabetes_X_train, diabetes_y_train, diabetes_X_test, di
     rss = np.mean((w0 + w1 * diabetes_X_test - diabetes_y_test) ** 2)
     print('My Residual sum of squares: %.2f' % rss)
     print('My R2 score: %.2f'% r2_score(diabetes_y_test, w0 + w1 * diabetes_X_test))
+    vs.scatter_for_regression(diabetes_X_test, diabetes_y_test, f(diabetes_X_test, w0, w1), 'red')
+
+
+
+def f(X, w0, w1) :
+    return w0 + w1 * X
 
 
 
 def updateParameters(w0, w1, X, y, alpha) :
-    dW0, dW1 = derivatives(w0, w1, X, y)
-    w0 = w0 - (alpha * dW0)
-    w1 = w1 - (alpha * dW1)
+    pred = f(X, w0, w1)
 
-    return w0, w1
+    t0 = w0 + 2 * alpha * (y - pred).mean()
+    t1 = w1 + 2 * alpha * (np.dot(X.transpose(), y[:, np.newaxis] - pred))
+
+    return t0, t1
 
 
 
-def derivatives(w0, w1, X, y) :
-    dW0 = 0
-    dW1 = 0
-
-    for (xi, yi) in zip(X, y) :
-        dW0 += w0 + w1 * xi - yi
-        dW1 += (w0 + w1 * xi - yi) * xi
-
-    dW0 = dW0 / len(X)
-    dW1 = dW1 / len(X)
+def derivatives(X, pred, y) :
+    dW0 = (pred - y).mean()
+    dW1 = ((pred - y) * X.reshape(-1, 1)).mean()
 
     return dW0, dW1
 
